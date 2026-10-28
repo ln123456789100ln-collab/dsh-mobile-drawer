@@ -124,6 +124,7 @@ launcher\Start-All.vbs
 - Cloudflare Quick Tunnel 每次重启换域名，手机需要重新扫码；要固定地址得用 Funnel/命名隧道。
 - 配对、加密、Relay 协议是上游项目设计的；本项目是适配和整合，安全强度取决于上游实现，**没有做过正式安全审计**。
 - 项目是个人自用整理，测试覆盖偏本机环境（iPhone + Win11 + DSH 桌面版），不保证所有版本/网络环境通用。
+- 这个方向已经有很多同类项目（更成熟的有 JochenYang/dsh-remote、@linxin666/dsh-remote-web-ui 等）；做上架或重构前先看 [docs/related-projects.md](docs/related-projects.md)，避免重复造轮子。
 
 ## 仓库结构
 
@@ -133,7 +134,7 @@ relay/             适配版 dsh-relay（TypeScript，MIT）；web/app 内含手
 plugin/            适配版 @april-jk/dsh-mobile（MIT）
 desktop-bridge/    可选：日常 DSH 实例的本地桥接插件
 tests/             手机/桌面布局回归、部署检查、截图脚本
-docs/              架构、快速开始、安全、排错、固定地址、手机 UI
+docs/              架构、快速开始、安全、排错、固定地址、手机 UI、同类项目对比
 tools/             cloudflared 放置位置（二进制不入库，见 tools/README.md）
 vendor/            适配版插件 npm 包（launcher / desktop-bridge 共用）
 assets/screenshots 脱敏截图
