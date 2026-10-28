@@ -4,3 +4,4 @@ tools/cloudflared.exe
 relay/dist/
 *.log
 .DS_Store
+panel-plugin/*.tgz

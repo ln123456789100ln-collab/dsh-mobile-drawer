@@ -1,0 +1,51 @@
+{
+  "name": "dsh-remote-kit-panel",
+  "version": "0.1.0",
+  "description": "DSH settings panel for the self-hosted DSH Remote Kit: show relay status, start/stop the kit and open its pairing control page.",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/host.js",
+  "exports": {
+    ".": "./lib/host.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    },
+    "engines": {
+      "dsh": ">=0.2.0-rc.1 <0.3.0-0"
+    },
+    "compatibility": {
+      "dsh": ">=0.2.0-rc.1 <0.3.0-0"
+    }
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "remote-access",
+    "remote-kit",
+    "self-hosted"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ln123456789100ln-collab/dsh-remote-kit.git",
+    "directory": "panel-plugin"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

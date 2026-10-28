@@ -36,6 +36,7 @@ DeepSeek Harness 桌面版很好用，但官方没有“人在外面，用手机
 | 桌面桥接 | [`desktop-bridge/`](desktop-bridge/) | 可选：让你的**日常 DSH 桌面实例**接入远程访问，而不是另起一个工作区 |
 | 手机 UI | [`relay/web/app/mobile.css`](relay/web/app/mobile.css)、[`relay/web/app/mobile.js`](relay/web/app/mobile.js) | 窄屏抽屉布局，由 Relay 的 Service Worker 注入 |
 | 测试 | [`tests/`](tests/) | 34 项手机/桌面布局回归 + 部署检查 + 脱敏截图生成 |
+| DSH 插件面板（可选） | [`panel-plugin/`](panel-plugin/) | 在 DSH 设置页里启停 kit、查看状态、打开配对控制页 |
 
 ## 工作原理
 
@@ -148,6 +149,22 @@ node live-sw-check.cjs https://你的relay地址
 ```
 
 `npm run screenshots` 会重新生成 README 截图，并自动把会话名/头像/余额/模型名打码。
+
+## DSH 插件面板（可选，Phase 1）
+
+不想每次去双击启动器的话，可以装这个配套插件：在 DSH 设置页里直接看远程状态、启停 kit、打开配对控制页。
+
+```powershell
+dsh plugin --profile web add https://github.com/ln123456789100ln-collab/dsh-remote-kit/releases/download/panel-v0.1.0/dsh-remote-kit-panel-0.1.0.tgz
+```
+
+装完刷新 DSH → **设置 → 插件配置 → 远程访问（Kit）**，填一下 kit 目录（例如 `C:\dsh-remote-kit`）就能用。
+
+说明：
+
+- 它只是控制面板，远程协议、配对、加密和手机 UI 仍由本 kit 提供；需要先按上面的步骤把 kit 装好。
+- 目前仅支持 Windows、DSH >= 0.2.0-rc.1；源码与开发说明见 [`panel-plugin/`](panel-plugin/)。
+- 这个插件目前是"配套面板"形态（Phase 1）；把它做成完全自包含（插件内自带 relay + cloudflared）是下一步。
 
 ## 许可证与致谢
 

@@ -1,0 +1,7 @@
+# Control panel for a DSH Remote Kit installation.
+# The panel only reads the kit's local state and starts/stops the kit's own
+# Windows launcher; it does not proxy or decrypt remote traffic itself.
+- insert:
+    - id: dsh-remote-kit-panel
+      name: dsh-remote-kit-panel
+      inject: [webServer]
