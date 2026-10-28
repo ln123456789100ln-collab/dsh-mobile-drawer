@@ -44,7 +44,7 @@
 前提：一个已经跑起来的 DSH 远程 Relay，以及和本仓库兼容的 DSH 版本（见下面的“兼容性”）。
 
 ```bash
-git clone <this-repo> dsh-mobile-drawer
+git clone https://github.com/ln123456789100ln-collab/dsh-mobile-drawer.git
 cd dsh-mobile-drawer
 
 # 1. 把 CSS/JS 内嵌进 sw.js
