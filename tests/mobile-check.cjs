@@ -10,7 +10,7 @@ const path = require("path");
 
 const hostFile = path.join(os.homedir(), ".dsh-remote", "desktop-host.json");
 const { url } = JSON.parse(fs.readFileSync(hostFile, "utf8"));
-const appDir = path.resolve(__dirname, "..", "app");
+const appDir = path.resolve(__dirname, "..", "relay", "web", "app");
 const artifactDir = path.join(__dirname, "artifacts");
 fs.mkdirSync(artifactDir, { recursive: true });
 

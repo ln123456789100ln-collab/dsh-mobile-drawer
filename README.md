@@ -1,115 +1,157 @@
-# DSH Mobile Drawer UI
+# DSH Remote Kit（DeepSeek Harness 手机远程套件）
 
-给 **DeepSeek Harness 手机远程页面**（[dsh-relay](https://github.com/april-jk/dsh-relay) 的浏览器端）补一套窄屏布局：
-顶部标题栏 + 滑入式抽屉 + 全宽聊天区。桌面端一根手指都不碰。
+让 **iPhone 扫码就能远程使用家里/办公室电脑上的 DeepSeek Harness**：
+Windows 一键启动器 + 自建 Relay + 加密隧道 + 手机端抽屉 UI，整套东西都在这个仓库里。
 
-> 这是我个人给自己用的小补丁，不是 DeepSeek 官方项目，也没打算做成大而全的框架。
-> 它只改 Relay 的浏览器端静态资源和 Service Worker，不碰 DSH 本体，不碰账号、密钥或你的会话数据。
+> 这是我自己在用的一套远程方案，不是 DeepSeek 官方产品。
+> 前提是你有一台常开的 Windows 电脑装 DSH，并且愿意自己部署（不需要买服务器）。
 
-## 先说为什么要做这个
-
-在 iPhone 上打开 DSH 远程页面时，原来的 56px 侧边栏一直占着左边，对话区被挤得又窄又长，输入框也是小小的一个。
-用起来就像在手机上硬塞了一个桌面布局——能用，但说不上舒服。
-
-我翻了一圈上游的 relay 和 plugin 仓库，没找到现成的窄屏方案，于是趁着周末自己写了一版：
-把侧边栏收进抽屉、聊天区铺满屏幕、输入框整宽、顶部只留一条 52px 的小标题栏。
-顺手还修了一个自己用着很难受的 bug：插件页和插件市场的内容会被固定顶栏压住半行。
-
-真机（iPhone）上用下来效果还行，所以把代码整理出来开源。如果你也在手机上用 DSH 远程，应该能少走一点弯路。
-
-| 手机聊天页 | 手机抽屉 | 插件页（顶栏不再吃内容） | 桌面端不受影响 |
+| 手机聊天页 | 手机抽屉 | 手机插件页 | 桌面端完全不受影响 |
 | --- | --- | --- | --- |
-| ![chat](docs/screenshots/mobile-chat.jpg) | ![drawer](docs/screenshots/mobile-drawer.jpg) | ![plugin](docs/screenshots/mobile-plugin.jpg) | ![desktop](docs/screenshots/desktop-1440.jpg) |
+| ![chat](assets/screenshots/mobile-chat.jpg) | ![drawer](assets/screenshots/mobile-drawer.jpg) | ![plugin](assets/screenshots/mobile-plugin.jpg) | ![desktop](assets/screenshots/desktop-1440.jpg) |
 
-## 它到底改了什么
+## 为什么要做这套东西
 
-- **手机窄屏**：隐藏原来的侧栏轨道，聊天区占满全宽。
-- **顶部固定 52px 标题栏**：左边菜单、中间标题（会话名 / 当前页面名）+ 下拉箭头、右边新对话；刘海屏的 safe-area 也处理了。
-- **侧边栏变成抽屉**：宽度 `min(78vw, 340px)`，带半透明遮罩和滑入动画；点遮罩、按 Escape、选中会话后自动关闭。
-- **抽屉里还是你熟悉的 DSH 侧边栏**：品牌、蓝色新会话、搜索、工作区/会话列表、工具、账号，一个都没少。
-- **搜索框就地过滤**：输入时只过滤已经加载出来的会话标题，无结果会提示“没有匹配的对话”。
-- **输入区整宽、字号 16px**（避免 iOS 聚焦时自动放大），底部 safe-area 也留出来了。
-- **插件 / 插件市场 / 自动化任务这些非聊天页**：自动避开固定顶栏，内容不再被压住；顶栏标题也会跟着页面变。
-- 移动端顺手藏掉了重复的品牌名、余额卡和“海洋皮肤”浮动按钮。
-- **桌面端没有变化**：所有样式都包在 `max-width: 720px` 里，1440 和 721 宽度下布局和原来一致。
+DeepSeek Harness 桌面版很好用，但官方没有“人在外面，用手机接着用家里电脑”的能力。
+已有的方案要么依赖别人的中转服务，要么手机上打开就是桌面布局——侧边栏挤着对话区，输入框小小一个，根本没法用。
 
-## 适合谁 / 不适合谁
+所以我把整套链路自己搭了一遍：
 
-**适合**：已经有一套能用的 DSH 远程 Relay（`dsh-relay` 那套 Web 客户端），想在手机上用得更舒服一点，也愿意自己动手替换一个 `sw.js` 的人。
+- **配对**：电脑上控制页显示二维码，iPhone 相机一扫就进；
+- **连接**：Cloudflare Quick Tunnel 打洞，不需要公网 IP、不需要开路由器端口；
+- **加密**：手机和电脑之间是端到端加密隧道（`sealed-tunnel-v1`），中转服务器只看到密文和路由信息；
+- **启动**：Windows 双击一下，隧道、Relay、工作区、防休眠全部拉起来；
+- **界面**：给手机窄屏补了抽屉布局，对话区铺满屏幕，桌面端完全不动；
+- **稳定**：支持开机自启、防休眠，想固定地址可以换 Tailscale Funnel 或 Cloudflare 命名隧道。
 
-**不适合**：想要开箱即用的 App、不想碰命令行、或者希望它跟 DSH 升级永久兼容的人——DSH 的 Web UI 会随版本变化，类名一改，这个补丁就有可能某天突然失效。这是它的命门，我提前说清楚。
+自己用了一段时间，真机（iPhone + Win11）跑通后整理开源。它不是 SaaS，也不会替你做托管——**服务器就是你的电脑**。
 
-## 装到自己的 Relay 上
+## 这套系统由什么组成
 
-前提：一个已经跑起来的 DSH 远程 Relay，以及和本仓库兼容的 DSH 版本（见下面的“兼容性”）。
+| 组件 | 目录 | 作用 |
+| --- | --- | --- |
+| 一键启动器 | [`launcher/`](launcher/) | Windows 入口：启动 cloudflared + Relay + DSH 工作区，控制页、配对码、防休眠、自启、固定地址 |
+| Relay 中继 | [`relay/`](relay/) | 基于 [dsh-relay](https://github.com/april-jk/dsh-relay)（MIT）的适配版：设备配对、加密隧道、Web 客户端、手机 UI 注入 |
+| DSH 插件 | [`plugin/`](plugin/) | 基于 [dsh-mobile-plugin](https://github.com/april-jk/dsh-mobile-plugin)（MIT）的适配版：在 DSH 里提供远程访问能力和 desktop host-auth |
+| 桌面桥接 | [`desktop-bridge/`](desktop-bridge/) | 可选：让你的**日常 DSH 桌面实例**接入远程访问，而不是另起一个工作区 |
+| 手机 UI | [`relay/web/app/mobile.css`](relay/web/app/mobile.css)、[`relay/web/app/mobile.js`](relay/web/app/mobile.js) | 窄屏抽屉布局，由 Relay 的 Service Worker 注入 |
+| 测试 | [`tests/`](tests/) | 34 项手机/桌面布局回归 + 部署检查 + 脱敏截图生成 |
 
-```bash
-git clone https://github.com/ln123456789100ln-collab/dsh-mobile-drawer.git
-cd dsh-mobile-drawer
+## 工作原理
 
-# 1. 把 CSS/JS 内嵌进 sw.js
-node scripts/build-mobile-sw.cjs
-node --check app/sw.js
-
-# 2. 备份你的 Relay 里的 web/app/sw.js，然后用刚生成的 app/sw.js 替换它
-#    同时把 app/mobile.css、app/mobile.js 一起放到 Relay 的 web/app/ 下（方便排查和版本对照）
-
-# 3. 按你自己的方式重启/重新部署 Relay 的静态服务
+```text
+ iPhone Safari（扫码配对）
+        │  HTTPS
+        ▼
+ 公网入口：Cloudflare Quick Tunnel / Tailscale Funnel / 命名隧道
+        │  只转发 TLS 与密文
+        ▼
+ 本机 Relay  http://127.0.0.1:8788   ←  「一键启动器」负责拉起和配置
+        │  加密 WebSocket（sealed-tunnel-v1，端到端加密）
+        ▼
+ DSH 桌面端 + @april-jk/dsh-mobile 插件（或独立的远程工作区）
+        │
+        ▼
+ 你的对话、文件、工具 —— 都在你自己电脑上
 ```
 
-然后手机打开 Relay，**刷新两次**：第一次装新的 Service Worker，第二次才会应用注入的界面。
+- 手机和电脑各持一把密钥，配对码里只带一次性凭据；Relay 负责转发**密文**，看不到对话内容。
+- 手机打开的是 Relay 的 `/app/` 页面，登入后通过加密隧道拿到 DSH Web UI；手机 UI 的 CSS/JS 也由 Relay 的 Service Worker 注入。
+- 更细的配对/加密流程见 [`docs/architecture.md`](docs/architecture.md)，安全边界见 [`docs/security.md`](docs/security.md)。
 
-如果你的 Relay 和参考实现差得比较多（比如没处理 CSP、静态文件结构不一样），看 [`docs/integration.md`](docs/integration.md)——其实就三处改动：
+## 快速开始（Windows）
 
-1. 在 SW 顶部内嵌 `MOBILE_CSS` / `MOBILE_JS`，定义注入标签；
-2. 代理到 HTML 响应时，把 `<link>` 和 `<script>` 插到 `<head>` 里；
-3. 在 `fetch` 事件最前面，由 SW 直接返回 `/app/mobile.css` 和 `/app/mobile.js`。
+> 完整步骤、常见报错见 [`docs/quickstart-windows.md`](docs/quickstart-windows.md)。
 
-Relay 的静态服务器没有这两个路由很正常（直接 curl 会 404/426），资源只走 Service Worker。
+前置：
 
-## 踩过的几个坑（写出来省得你再踩）
+- Windows 10/11，已安装 **DeepSeek Harness 桌面版**（默认路径 `%LOCALAPPDATA%\Programs\DeepSeek Harness`）
+- Node.js LTS（启动器默认用 `%ProgramFiles%\nodejs\node.exe`）
+- 一台 iPhone（Safari 15.4+）
 
-- **固定顶栏会盖住非聊天页**：聊天页有 `.an3WzG_header` 占位，插件页没有，内容从 y=0 开始，于是被顶栏吃掉 52px。现在的做法是给这类页面统一补 `padding-top`。
-- **Relay 静态服务器不认 `/app/mobile.css`**：所以在 SW 里把 CSS/JS 内嵌，由 fetch 直接吐出来，不依赖服务端新增路由。
-- **CSP meta 会拦注入的内联脚本**：参考实现会把代理 HTML 里的 CSP meta 去掉（这是上游 relay 已有的行为，不是这次加的）。
-- **手机要刷两次**：新 SW 装好后由 `skipWaiting` + `clients.claim` 接管，但当前页面的 CSS/JS 还是旧的，需要再次导航才换成新的。
+```powershell
+git clone https://github.com/ln123456789100ln-collab/dsh-remote-kit.git
+cd dsh-remote-kit
 
-## 验证方式
+# 1) 下载 cloudflared（版本必须匹配，启动器会校验 SHA256）
+curl.exe -L -o tools\cloudflared.exe https://github.com/cloudflare/cloudflared/releases/download/2026.10.3/cloudflared-windows-amd64.exe
+Get-FileHash tools\cloudflared.exe -Algorithm SHA256   # 应等于 tools\README.md 里的值
 
-```bash
+# 2) 构建 Relay
+cd relay
+npm ci
+npm run build
+cd ..
+
+# 3) 启动
+launcher\Start-All.vbs
+```
+
+启动后浏览器会自动打开本机控制页 `http://127.0.0.1:30889`：
+
+1. 点“显示配对码”，用 iPhone 相机扫码；
+2. 手机首次进入后**刷新两次**（第一次装 Service Worker，第二次应用手机 UI）；
+3. 想停止：控制页“停止并退出启动器”。
+
+想固定地址（不再每次重启换隧道域名）：看 [`docs/fixed-relay.md`](docs/fixed-relay.md)。
+想让远程连接**日常桌面 DSH 实例**而不是独立工作区：看 [`docs/desktop-mode.md`](docs/desktop-mode.md)（可选，属于进阶用法）。
+
+## 功能清单
+
+- 扫码配对，手机浏览器直接使用，不需要装 App。
+- Cloudflare Quick Tunnel 打洞，无需公网 IP、无需端口映射；也可换 Tailscale Funnel / 命名隧道固定地址。
+- 端到端加密隧道，Relay 只做密文转发；设备密钥只存在手机浏览器 IndexedDB 和电脑本机。
+- 手机窄屏抽屉 UI：52px 顶栏、78vw 抽屉、会话本地过滤、输入区整宽、safe-area 适配、非聊天页不被顶栏遮挡。
+- 桌面端零改动（所有样式限定在 `max-width: 720px`）。
+- Windows 一键启动：cloudflared → Relay → 工作区自动串联，控制页管理启停与配对。
+- 防休眠、开机自启脚本。
+- Relay 侧 gzip + 版本化静态缓存 + 手机轻量资源，冷启动加载明显更快。
+- 可选桌面模式：远程操作日常 DSH 实例（历史对话、插件、文件都在）。
+
+## 安全与隐私
+
+- 所有凭据（`controller.json`、`remote.json`、Relay 数据库、JWT、配对二维码内容）只存在电脑本机 `%USERPROFILE%\.dsh-remote`，**不在这个仓库里**。
+- Relay 只看到路由元数据、密文大小和时序；对话内容由手机和电脑端到端加密。
+- 手机访问链接里带一次性配对凭据，别把二维码/链接转发给别人；用完可以撤销配对。
+- 这个仓库不含 `cloudflared.exe`、DSH 安装包、任何设备密钥或真实会话截图（文档截图已脱敏）。
+- 详细威胁模型和自检清单：[`docs/security.md`](docs/security.md)。
+
+## 已知限制
+
+- **启动器只有 Windows 版**；macOS/Linux 需要自己手动跑 Relay + 插件（协议是通的，但没有打包入口）。
+- 手机 UI 依赖 DSH Web 的 CSS Module 类名（带哈希）。**DSH 升级后可能失效**，届时跑 `tests/mobile-check.cjs` 定位。
+- Cloudflare Quick Tunnel 每次重启换域名，手机需要重新扫码；要固定地址得用 Funnel/命名隧道。
+- 配对、加密、Relay 协议是上游项目设计的；本项目是适配和整合，安全强度取决于上游实现，**没有做过正式安全审计**。
+- 项目是个人自用整理，测试覆盖偏本机环境（iPhone + Win11 + DSH 桌面版），不保证所有版本/网络环境通用。
+
+## 仓库结构
+
+```text
+launcher/          Windows 一键启动器（Node + VBS + PowerShell）
+relay/             适配版 dsh-relay（TypeScript，MIT）；web/app 内含手机 UI
+plugin/            适配版 @april-jk/dsh-mobile（MIT）
+desktop-bridge/    可选：日常 DSH 实例的本地桥接插件
+tests/             手机/桌面布局回归、部署检查、截图脚本
+docs/              架构、快速开始、安全、排错、固定地址、手机 UI
+tools/             cloudflared 放置位置（二进制不入库，见 tools/README.md）
+vendor/            适配版插件 npm 包（launcher / desktop-bridge 共用）
+assets/screenshots 脱敏截图
+```
+
+## 测试
+
+```powershell
 cd tests
 npm install
-
-# 布局回归：需要本机 DSH 桌面端在运行（读取 ~/.dsh-remote/desktop-host.json），
-# 会把真实页面注入测试，覆盖移动 393×844 + 桌面 1440/721，共 34 项断言
-npm run test:mobile
-
-# 部署检查：验证你的 Relay 域名上 SW 和资源是否真的生效
-node live-sw-check.cjs https://your-relay.example.com
+npm run test:mobile     # 需要本机 DSH 桌面端在运行（34 项断言）
+node live-sw-check.cjs https://你的relay地址
 ```
 
-`npm run screenshots` 可以重新生成 README 里的截图（会自动把会话名、头像、余额、模型名打码或隐藏）。
+`npm run screenshots` 会重新生成 README 截图，并自动把会话名/头像/余额/模型名打码。
 
-## 兼容性和已知限制
+## 许可证与致谢
 
-- 适配基线：DSH 桌面版 `app.asar` 时间戳 **2026-10-23 16:00**；Relay 参考实现基于适配版 `dsh-relay` 0.1.9，UI 版本 `mobile4`。
-- DSH 升级后如果顶栏/抽屉失效，先跑 `tests/mobile-check.cjs`，失败项会告诉你哪个 CSS Module 类名不匹配了。
-- 手机上需要刷新两次才会看到新版本；旧页面会一直用旧样式直到刷新。
-- 搜索只是**已加载会话标题的本地过滤**，不是 DSH 全量搜索。
-- 抽屉没有左滑关闭手势；消息区还是 DSH 原样（头像、消息卡片这些没动）。
-- iOS 需要 Safari 15.4+（用到了 `dvh` 和 `env(safe-area-inset-*)`）。
-- 本仓库只负责“显示层”。配对、加密、隧道这些都在 Relay 项目里，不在本仓库范围。
-
-## 隐私和安全
-
-- 仓库里**没有** `cloudflared.exe`、DSH 安装包、Relay 后端、任何设备密钥/二维码/JWT/数据库。
-- `mobile.js` 不读 `localStorage`/IndexedDB/令牌，也不发起任何网络请求。
-- 截图经过脱敏：会话名换成“示例会话 01…”，头像、余额、模型名都隐藏或替换了；图片本身也没有 EXIF 信息。
-- 安装步骤里需要你自己准备 Relay；本仓库不提供现成的公网服务。
-
-## 致谢和 License
-
-- 注入思路和 `sw.template.js` 基于 [april-jk/dsh-relay](https://github.com/april-jk/dsh-relay)（MIT）和 [dsh-mobile-plugin](https://github.com/april-jk/dsh-mobile-plugin)（MIT），版权声明见 [NOTICE.md](NOTICE.md)。
-- 本项目用 [MIT License](LICENSE) 开源。如果你改了它、想合并回上游，欢迎顺手给上游项目提个 issue 或 PR。
-
-如果它帮你省下了一个下午，点个 star 就好；用坏了也欢迎开 issue，我尽力修（但不保证每次都修得动 😅）。
+- 本项目使用 [MIT License](LICENSE)。
+- Relay 与插件分别来自 [april-jk/dsh-relay](https://github.com/april-jk/dsh-relay) 和 [april-jk/dsh-mobile-plugin](https://github.com/april-jk/dsh-mobile-plugin)（均为 MIT），适配改动和版权声明见 [NOTICE.md](NOTICE.md) 与各目录下的 `LICENSE` / `FORK-NOTES.md`。
+- DeepSeek Harness 是 DeepSeek 的产品，本项目与官方无关，也不分发 DSH 本体。
+- 如果这套东西帮你省了折腾的时间，点个 star 就好；遇到问题欢迎开 issue。

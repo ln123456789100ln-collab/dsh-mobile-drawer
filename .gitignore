@@ -1,4 +1,6 @@
 node_modules/
-artifacts/
-app/sw.js
+tests/artifacts/
+tools/cloudflared.exe
+relay/dist/
 *.log
+.DS_Store

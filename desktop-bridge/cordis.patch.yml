@@ -1,0 +1,5 @@
+# Connect the existing desktop host without replacing its directory picker or profile.
+- insert:
+    - id: dsh-mobile-desktop-local
+      name: dsh-mobile-desktop-local
+      inject: [webStartup, webServer, connection]

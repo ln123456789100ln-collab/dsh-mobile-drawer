@@ -1,11 +1,12 @@
 {
-  "name": "dsh-mobile-drawer-tests",
+  "name": "dsh-remote-kit-tests",
   "private": true,
   "version": "1.0.0",
-  "description": "Regression checks and screenshot capture for the DSH mobile drawer UI",
+  "description": "Layout regression, deployment checks and screenshot capture for DSH Remote Kit",
   "scripts": {
     "test:mobile": "node mobile-check.cjs",
     "test:live-sw": "node live-sw-check.cjs",
+    "test": "node mobile-check.cjs",
     "screenshots": "node capture-screenshots.cjs"
   },
   "devDependencies": {

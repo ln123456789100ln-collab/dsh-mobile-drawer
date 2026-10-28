@@ -1,0 +1,12 @@
+{
+  "name": "dsh-mobile-desktop-local",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs",
+  "files": ["index.mjs", "cordis.patch.yml"],
+  "dsh": {"bundle": {"patch": "./cordis.patch.yml"}},
+  "dependencies": {
+    "@april-jk/dsh-mobile": "file:../vendor/dsh-mobile-0.1.9-local-compat.tgz"
+  }
+}

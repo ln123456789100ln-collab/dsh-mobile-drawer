@@ -1,11 +1,9 @@
-// Build app/sw.js from app/sw.template.js by embedding mobile.css and mobile.js.
-// Usage: node scripts/build-mobile-sw.cjs
 "use strict";
 
 const fs = require("fs");
 const path = require("path");
 
-const app = path.join(__dirname, "..", "app");
+const app = path.join(__dirname, "app");
 const template = fs.readFileSync(path.join(app, "sw.template.js"), "utf8");
 const css = fs.readFileSync(path.join(app, "mobile.css"), "utf8");
 const js = fs.readFileSync(path.join(app, "mobile.js"), "utf8");
