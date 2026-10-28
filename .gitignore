@@ -1,0 +1,4 @@
+node_modules/
+artifacts/
+app/sw.js
+*.log

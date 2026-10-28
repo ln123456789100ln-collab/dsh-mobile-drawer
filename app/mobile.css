@@ -1,0 +1,423 @@
+/* DSH mobile drawer UI. Scoped to narrow screens; desktop layout is untouched. */
+#dsh-mobile-topbar,
+#dsh-mobile-backdrop,
+.dsh-mobile-search,
+.dsh-mobile-search-empty {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --dsh-mobile-topbar-h: 52px;
+    --dsh-mobile-drawer-w: min(78vw, 340px);
+    --dsh-mobile-bg: var(--dsw-alias-bg-primary, #0d1015);
+    --dsh-mobile-surface: var(--dsw-alias-bg-secondary, #171b21);
+    --dsh-mobile-line: var(--dsw-alias-border-l3, rgba(255, 255, 255, .09));
+    --dsh-mobile-label: var(--dsw-alias-label-primary, #f2f4f7);
+    --dsh-mobile-muted: var(--dsw-alias-label-secondary, #9aa3af);
+    --dsh-mobile-brand: var(--dsw-alias-brand-primary, #4d6bfe);
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    background: var(--dsh-mobile-bg);
+    overscroll-behavior-y: none;
+  }
+
+  /* One full-width column. The sidebar is taken out of the layout and becomes a drawer. */
+  .mP3x-q_frame {
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    grid-template-columns: 0 minmax(0, 1fr) 0 !important;
+    grid-template-rows: minmax(0, 1fr) 0 !important;
+    overflow: hidden !important;
+  }
+
+  .mP3x-q_centerCol {
+    grid-column: 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .mP3x-q_rightbarCol,
+  .mP3x-q_sidebarCol {
+    display: none !important;
+  }
+
+  .mP3x-q_frame > .an3WzG_widthHandle,
+  .an3WzG_widthHandle {
+    display: none !important;
+  }
+
+  .an3WzG_root {
+    --dsh-conversation-column-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .an3WzG_body,
+  .an3WzG_scrollBody {
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .an3WzG_viewArea {
+    max-width: 100% !important;
+  }
+
+  /* Reserve room for the fixed mobile bar, but hide the desktop header contents. */
+  .an3WzG_header {
+    height: calc(var(--dsh-mobile-topbar-h) + env(safe-area-inset-top)) !important;
+    min-height: calc(var(--dsh-mobile-topbar-h) + env(safe-area-inset-top)) !important;
+    padding: env(safe-area-inset-top) 10px 0 !important;
+    border-bottom: 0 !important;
+    visibility: hidden !important;
+  }
+
+  .an3WzG_header > * {
+    display: none !important;
+  }
+
+  /* Non-chat routes (plugin pages, plugin market, automation, ...) have no .an3WzG_header
+     and render their own page head at y=0. Reserve the fixed topbar height so it stays clear. */
+  html:not(.dsh-mobile-chat-route) .mP3x-q_centerCol {
+    box-sizing: border-box !important;
+    padding-top: calc(var(--dsh-mobile-topbar-h) + env(safe-area-inset-top)) !important;
+  }
+
+  /* Fixed top app bar. */
+  #dsh-mobile-topbar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 900;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 0;
+    box-sizing: border-box;
+    height: calc(var(--dsh-mobile-topbar-h) + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 6px 0;
+    color: var(--dsh-mobile-label);
+    background: var(--dsh-mobile-bg);
+    border-bottom: .5px solid var(--dsh-mobile-line);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .dsh-mobile-bar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    padding: 0;
+    color: var(--dsh-mobile-label);
+    background: transparent;
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+
+  .dsh-mobile-bar-btn:active {
+    background: rgba(127, 127, 127, .16);
+  }
+
+  .dsh-mobile-bar-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .dsh-mobile-title {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    height: 44px;
+    margin: 0;
+    padding: 0 4px;
+    color: var(--dsh-mobile-label);
+    background: transparent;
+    border: 0;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    cursor: pointer;
+  }
+
+  .dsh-mobile-title-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dsh-mobile-title-chevron {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    color: var(--dsh-mobile-muted);
+  }
+
+  /* Drawer backdrop. */
+  #dsh-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 940;
+    display: none;
+    background: rgba(0, 0, 0, .56);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    touch-action: none;
+  }
+
+  html.dsh-mobile-drawer-open #dsh-mobile-backdrop {
+    display: block;
+    animation: dsh-mobile-fade .18s ease-out;
+  }
+
+  html.dsh-mobile-drawer-open .mP3x-q_sidebarCol {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    z-index: 950 !important;
+    width: var(--dsh-mobile-drawer-w) !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-width: 0 !important;
+    background: var(--dsh-mobile-bg) !important;
+    border-right: .5px solid var(--dsh-mobile-line);
+    box-shadow: 10px 0 34px rgba(0, 0, 0, .34);
+    overflow: hidden !important;
+    animation: dsh-mobile-slide .2s cubic-bezier(.2, .8, .2, 1);
+  }
+
+  html.dsh-mobile-drawer-open .mP3x-q_sidebarCol > * {
+    height: 100% !important;
+  }
+
+  html.dsh-mobile-drawer-open .mP3x-q_sidebarCol .wtg9ga_root {
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding-top: calc(6px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
+    overflow: hidden !important;
+  }
+
+  /* Reorder the existing sidebar: brand/new chat, workspace, tools, account. */
+  html.dsh-mobile-drawer-open .wtg9ga_logoRow {
+    order: 0 !important;
+    flex: 0 0 auto !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_newSession {
+    order: 1 !important;
+    flex: 0 0 auto !important;
+    min-height: 44px !important;
+    margin: 2px 2px 10px !important;
+    color: #fff !important;
+    background: var(--dsh-mobile-brand) !important;
+    border-radius: 12px !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_newSessionLabelMask {
+    color: #fff !important;
+    font-size: 14px !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_newSessionShortcut {
+    display: none !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_regionArea {
+    order: 2 !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_panelList {
+    order: 3 !important;
+    flex: 0 0 auto !important;
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+    border-top: .5px solid var(--dsh-mobile-line);
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_panelList::before {
+    content: "工具";
+    display: block;
+    padding: 0 8px 6px;
+    color: var(--dsh-mobile-muted);
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: .04em;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_footArea {
+    order: 4 !important;
+    flex: 0 0 auto !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_brand {
+    gap: 8px !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_brandIdentity {
+    font-size: 0 !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_brandName {
+    display: none !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_footerActions {
+    display: none !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_brand::after {
+    content: "DeepSeek";
+    color: var(--dsh-mobile-label);
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: -.02em;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_iconButton.wtg9ga_toggle {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px;
+  }
+
+  /* Mobile-only search field: filters the existing session list in place. */
+  .dsh-mobile-search {
+    box-sizing: border-box;
+    display: flex;
+    width: calc(100% - 4px);
+    height: 40px;
+    margin: 0 2px 10px;
+    padding: 0 11px;
+    align-items: center;
+    gap: 8px;
+    color: var(--dsh-mobile-muted);
+    background: var(--dsh-mobile-surface);
+    border: .5px solid var(--dsh-mobile-line);
+    border-radius: 11px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .dsh-mobile-search svg {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+  }
+
+  .dsh-mobile-search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    color: var(--dsh-mobile-label);
+    background: transparent;
+    border: 0;
+    outline: 0;
+    font: inherit;
+    font-size: 16px;
+  }
+
+  .dsh-mobile-search input::placeholder {
+    color: var(--dsh-mobile-muted);
+    opacity: 1;
+  }
+
+  .dsh-mobile-search-empty {
+    display: none;
+    padding: 12px 10px;
+    color: var(--dsh-mobile-muted);
+    font-size: 13px;
+  }
+
+  .dsh-mobile-search-empty.is-visible {
+    display: block;
+  }
+
+  .dsh-mobile-search-hidden {
+    display: none !important;
+  }
+
+  html.dsh-mobile-drawer-open .wtg9ga_regionArea .GAkraW_searchButton {
+    display: none !important;
+  }
+
+  /* Composer: keep the real controls, make the bottom safe area usable. */
+  .an3WzG_composerSeat {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .an3WzG_composerStack,
+  .GRgSLq_root {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .GRgSLq_card {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .GRgSLq_row {
+    gap: 4px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .GRgSLq_trailing,
+  .GRgSLq_standardControls {
+    min-width: 0 !important;
+    gap: 4px !important;
+  }
+
+  .GRgSLq_activity {
+    display: none !important;
+  }
+
+  .GRgSLq_card ._tag_brmue_4 {
+    display: none !important;
+  }
+
+  .GRgSLq_input,
+  .GRgSLq_placeholder {
+    font-size: 16px !important;
+  }
+
+  .GRgSLq_dock {
+    display: none !important;
+  }
+
+  button[aria-label="海洋皮肤设置"] {
+    display: none !important;
+  }
+
+  @keyframes dsh-mobile-slide {
+    from { transform: translateX(-102%); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes dsh-mobile-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}

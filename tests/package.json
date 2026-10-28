@@ -1,0 +1,14 @@
+{
+  "name": "dsh-mobile-drawer-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Regression checks and screenshot capture for the DSH mobile drawer UI",
+  "scripts": {
+    "test:mobile": "node mobile-check.cjs",
+    "test:live-sw": "node live-sw-check.cjs",
+    "screenshots": "node capture-screenshots.cjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1"
+  }
+}
